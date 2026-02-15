@@ -20,14 +20,13 @@ in {
   # https://devenv.sh/tasks/
   tasks = {
     "mason:clean" = {
-      before = "mason:build";
       exec = ''
         rm -rf isodir build
       '';
     };
     "mason:build" = {
-      before = "mason:assemble_iso";
       exec = ''
+        rm -rf isodir build
         mkdir -p build
         i686-elf-as ./src/boot/boot.s -o ./build/boot.o
         i686-elf-gcc -c ./src/kernel/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
@@ -35,8 +34,12 @@ in {
       '';
     };
     "mason:assemble_iso" = {
-      before = "mason:test";
       exec = ''
+        rm -rf isodir build
+        mkdir -p build
+        i686-elf-as ./src/boot/boot.s -o ./build/boot.o
+        i686-elf-gcc -c ./src/kernel/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o -lgcc
         mkdir -p isodir/boot/grub
         cp ./build/mason isodir/boot/mason
         cp ./src/grub.cfg isodir/boot/grub/grub.cfg
@@ -45,6 +48,15 @@ in {
     };
     "mason:test" = {
       exec = ''
+        rm -rf isodir build
+        mkdir -p build
+        i686-elf-as ./src/boot/boot.s -o ./build/boot.o
+        i686-elf-gcc -c ./src/kernel/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o -lgcc
+        mkdir -p isodir/boot/grub
+        cp ./build/mason isodir/boot/mason
+        cp ./src/grub.cfg isodir/boot/grub/grub.cfg
+        grub-mkrescue -o mason.iso isodir
         qemu-system-i386 -cdrom mason.iso
       '';
     };
