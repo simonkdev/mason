@@ -44,7 +44,7 @@ stdenv.mkDerivation rec {
 
 
 
-    ../configure --target=${crossTarget} --prefix=${installPrefix} --disable-nls --disable-werror
+    ../configure --target=${crossTarget} --prefix=$out --disable-nls --disable-werror
   '';
 
   buildPhase = ''

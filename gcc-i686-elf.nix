@@ -38,7 +38,18 @@ in
       pkgs.valgrind
     ];
 
-    buildInputs = [];
+    buildInputs = [
+      makeWrapper
+      gmp
+      mpfr
+      mpc
+      isl
+      pkgs.texinfo
+      pkgs.perl
+      pkgs.libmpc
+      binutils
+      pkgs.valgrind
+    ];
 
     unpackPhase = ''
       tar -xf $src -C . --strip-components=1
@@ -52,24 +63,21 @@ in
       export CFLAGS=""
       export CXXFLAGS=""
 
-      ../configure --target=${crossTarget} --prefix=${installPrefix} --disable-nls --with-gmp=${gmp} --with-mpfr=${mpfr} --with-mpc=${mpc} --with-isl=${isl} --with-as=${binutils}/bin/i686-elf-as --with-ld=${binutils}/bin/true --disable-nls --disable-multilib --enable-languages=c,c++ --without-headers --disable-shared --disable-threads --disable-libssp --disable-libgomp --disable-libquadmath --disable-libatomic
+      ../configure --target=${crossTarget} --prefix=$out --disable-nls --with-gmp=${gmp} --with-mpfr=${mpfr} --with-mpc=${mpc} --with-isl=${isl} --with-as=${binutils}/bin/i686-elf-as --with-ld=${binutils}/bin/i686-elf-ld --disable-nls --disable-multilib --enable-languages=c,c++ --without-headers --disable-shared --disable-threads --disable-libssp --disable-libgomp --disable-libquadmath --disable-libatomic
 
 
 
     '';
 
     buildPhase = ''
-      export PATH="${installPrefix}/bin:$PATH"
+      export PATH="${binutils}/bin:$PATH"
       make all-gcc -j$(nproc)
       make all-target-libgcc -j$(nproc)
-      make all-target-libstdc++-v3 -j$(nproc)
     '';
 
     installPhase = ''
       make install-gcc
       make install-target-libgcc
-      make install-target-libstdc++-v3
-
     '';
 
     meta = with lib; {
