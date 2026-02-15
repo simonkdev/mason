@@ -3,6 +3,7 @@
   gcc-i686 = pkgs.callPackage ./gcc-i686-elf.nix {};
 in
   pkgs.mkShell {
+    hardeningDisable = ["all" "format"];
     # Ensure the i686‑elf GCC is in PATH
     buildInputs = [
       binutils-i686

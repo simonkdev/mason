@@ -29,6 +29,7 @@ stdenv.mkDerivation rec {
     isl
     pkgs.texinfo
     pkgs.perl
+    pkgs.libmpc
   ];
 
   buildInputs = [];
@@ -40,6 +41,8 @@ stdenv.mkDerivation rec {
   configurePhase = ''
     mkdir -p build-binutils
     cd build-binutils
+
+
 
     ../configure --target=${crossTarget} --prefix=${installPrefix} --disable-nls --disable-werror
   '';
