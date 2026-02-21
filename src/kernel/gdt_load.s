@@ -1,24 +1,32 @@
-.section .text
 
-.global _gdt_load
-.type _gdt_load, @function
+.section .asm
 
-_gdt_load:
-    mov 4(%esp), %eax      # pointer to GDTR struct
-    lgdt (%eax)            # load GDT
+gdtr:
+    .word 0
+    .long 0
 
-    # Reload data segments
-    mov $0x00, %ax
-    mov %ax, %ds
-    mov %ax, %es
-    mov %ax, %fs
-    mov %ax, %gs
-    mov %ax, %ss
+.globl setGdt
+.type setGdt, @function
 
-    # Far jump to reload CS
-    ljmp $0x00, $flush
-
-flush:
+setGdt:
+    movl 8(%esp), %eax    /* base */
+    movl %eax, gdtr+2
+    movw 4(%esp), %ax     /* limit */
+    movw %ax, gdtr
+    lgdt gdtr
     ret
 
-.size _gdt_load, . - _gdt_load#
+.global reloadSegments
+.type reloadSegments, @function
+
+reloadSegments:
+    ljmp $0x08, $next
+
+next:
+    movw $0x10, %ax              
+    movw %ax, %ds
+    movw %ax, %es
+    movw %ax, %fs
+    movw %ax, %gs
+    movw %ax, %ss
+    ret

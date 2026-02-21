@@ -70,4 +70,5 @@ in {
   };
 }
 #./build/gdt.o ./build/gdt_load.o
+#i686-elf-as ./src/kernel/gdt_load.s -o ./build/gdt_load.o
 

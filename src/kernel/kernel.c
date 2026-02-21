@@ -3,13 +3,6 @@
 #include <stdbool.h>
 #include "gdt.h"
 
-#if defined(__linux__)
-#error "You are not using a cross-compiler, you will most certainly run into trouble"
-#endif
-
-#if !defined(__i386__)
-#error "This kernel needs to be compiled with a ix86-elf compiler"
-#endif
 
 enum vga_color {
     VGA_COLOR_BLACK = 0,
@@ -109,13 +102,103 @@ void terminal_writestring(const char* data)
     terminal_write(data, strlen(data));
 }
 
-void kernel_main(void)
-{
-    
 
+void terminal_write_u64(uint64_t value, int base, bool add_prefix, bool uppercase)
+{
+    static const char digits_low[]  = "0123456789abcdef";
+    static const char digits_high[] = "0123456789ABCDEF";
+    const char* digits = uppercase ? digits_high : digits_low;
+
+    if (base != 2 && base != 10 && base != 16) {
+        return;
+    }
+
+    char buf[80];
+    int pos = 0;
+    if (value == 0) {
+        if (add_prefix && base == 16) {
+            buf[pos++] = '0'; buf[pos++] = uppercase ? 'X' : 'x';
+        } else if (add_prefix && base == 2) {
+            buf[pos++] = '0'; buf[pos++] = 'b';
+        }
+        buf[pos++] = '0';
+        buf[pos] = '\0';
+        terminal_writestring(buf);
+        terminal_writestring("\n");
+        return;
+    }
+
+    char rev[80];
+    int ri = 0;
+    while (value != 0) {
+        unsigned rem = (unsigned)(value % (uint64_t)base);
+        rev[ri++] = digits[rem];
+        value /= (uint64_t)base;
+    }
+
+    if (add_prefix) {
+        if (base == 16) {
+            buf[pos++] = '0'; buf[pos++] = uppercase ? 'X' : 'x';
+        } else if (base == 2) {
+            buf[pos++] = '0'; buf[pos++] = 'b';
+        }
+    }
+
+    for (int i = ri - 1; i >= 0; --i)
+        buf[pos++] = rev[i];
+
+    buf[pos] = '\0';
+    terminal_writestring(buf);
+    terminal_writestring("\n");
+}
+
+char* itoa(int value, char* result, int base) {
+    if (base < 2 || base > 36) { *result = '\0'; return result; }
+
+    char* ptr = result, *ptr1 = result, tmp_char;
+    int tmp_value;
+
+    do {
+        tmp_value = value;
+        value /= base;
+        *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
+    } while ( value );
+
+    if (tmp_value < 0) *ptr++ = '-';
+    *ptr-- = '\0';
+  
+    while(ptr1 < ptr) {
+        tmp_char = *ptr;
+        *ptr--= *ptr1;
+        *ptr1++ = tmp_char;
+    }
+    return result;
+}
+
+void terminal_writeint(int value, char* result, int base)
+{
+    itoa(value, result, base);
+    terminal_writestring(result);
+    terminal_writestring("\n");
+}
+
+
+void kernel_gdt(void)
+{
     terminal_initialize();
     terminal_writestring("Hello, kernel World!\n");
     terminal_writestring("In a galaxy far, far away...\n");
 
     gdt_init();
+
+    kernel_main();
+}
+
+void kernel_main(void)
+{
+
+    terminal_writestring("GDT initialized\n");
+
+    uint64_t dummy = 123; 
+    terminal_write_u64(dummy, 10, false, false);
 }

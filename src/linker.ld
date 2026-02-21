@@ -3,8 +3,8 @@ ENTRY(_start)
 SECTIONS
 {
     . = 2M;
-
-    .text BLOCK(4K) : ALIGN(4K)
+    
+    .multiboot BLOCK(4K) : ALIGN(4K)
     {
         *(.multiboot)
         *(.text)
@@ -24,5 +24,10 @@ SECTIONS
     {
         *(COMMON)
         *(.bss)
+    }
+    
+    .asm BLOCK(4K) : ALIGN(4K)
+    {
+        *(.asm)
     }
 }

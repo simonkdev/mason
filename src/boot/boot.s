@@ -5,7 +5,7 @@
 .set CHECKSUM,   -(MAGIC + FLAGS)
 
 .section .multiboot
-.align 4
+.align 8
 .long MAGIC
 .long FLAGS
 .long CHECKSUM
@@ -23,7 +23,7 @@ stack_top:
 _start:
     mov $stack_top, %esp
     cli
-    call kernel_main
+    call kernel_gdt
 
     cli
 1:  hlt
