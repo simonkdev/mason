@@ -17,6 +17,7 @@ stack_bottom:
 stack_top:
 
 .section .text
+
 .global _start
 .type _start, @function
 _start:
@@ -27,4 +28,5 @@ _start:
     cli
 1:  hlt
     jmp 1b
-.size _start, . - _start
+.size _start, . - _start#
+

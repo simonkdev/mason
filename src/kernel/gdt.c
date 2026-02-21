@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "gdt.h"
 
 #define SEG_G_FLAG(x) ((x) << 11) // Granularity flag (bit 11)
 #define SEG_DB_FLAG(x) ((x) << 10) // Size flag (bit 10)
@@ -16,7 +17,13 @@
 
 #define GDT_ENTRY_NULL 0
 #define GDT_ENTRY_KCODE_FLAGS (SEG_G_FLAG(1) | SEG_DB_FLAG(1) | SEG_L_FLAG(0) | SEG_P_FLAG(1) | SEG_DPL_FLAG(0) | SEG_S_FLAG(1) | SEG_E_FLAG(1) | SEG_DC_FLAG(0) | SEG_RW_FLAG(1) | SEG_A_FLAG(1))  
-#define GDT_ENTRY_KDATA (SEG_G_FLAG(1) | SEG_DB_FLAG(1) | SEG_L_FLAG(0) | SEG_P_FLAG(1) | SEG_DPL_FLAG(0) | SEG_S_FLAG(1) | SEG_E_FLAG(0) | SEG_DC_FLAG(0) | SEG_RW_FLAG(1) | SEG_A_FLAG(1))
+#define GDT_ENTRY_KDATA_FLAGS (SEG_G_FLAG(1) | SEG_DB_FLAG(1) | SEG_L_FLAG(0) | SEG_P_FLAG(1) | SEG_DPL_FLAG(0) | SEG_S_FLAG(1) | SEG_E_FLAG(0) | SEG_DC_FLAG(0) | SEG_RW_FLAG(1) | SEG_A_FLAG(1))
+#define GDT_ENTRY_COUNT 3
+
+// typedef struct {
+//     uint16_t limit;
+//     uint32_t base;
+// }__attribute__((packed)) gdtr;
 
 uint64_t assemble_gdt_entry(uint32_t base, uint32_t limit, uint16_t flags)
 {
@@ -28,7 +35,7 @@ uint64_t assemble_gdt_entry(uint32_t base, uint32_t limit, uint16_t flags)
     descriptor |= (flags & 0b00100000000); //set long mode (flags bit 8)
     descriptor |= (limit & 0x000F0000); // set limit bits 16-19
     descriptor |= (flags & 0b00001111111); // set access flags (bits 0-7)
-    descriptor |= (base & 00000000011111111000000000000000); // set base bits 16-23
+    descriptor |= (base & 0b00000000011111111000000000000000); // set base bits 16-23
     descriptor = descriptor << 32; // shift the base and flags to the upper 32 bits
     descriptor |= (base & 0x0000FFFF) << 16; // set base bits 0-15 and shift them to bits 16-31
     descriptor |= (limit & 0x0000FFFF); // set limit bits 0-15
@@ -36,5 +43,21 @@ uint64_t assemble_gdt_entry(uint32_t base, uint32_t limit, uint16_t flags)
     return descriptor;
 }
 
+uint64_t gdt[3]; // GDT with 3 entries: null, kernel code, kernel data
+
+extern void _gdt_load(gdtr* gdtr_ptr); // Defined in gdt_load.s
+
+void gdt_init() {
+
+    gdt[0] = GDT_ENTRY_NULL; // Null descriptor
+    gdt[1] = assemble_gdt_entry(0x00000000, 0xFFFFFFFF, GDT_ENTRY_KCODE_FLAGS); 
+    gdt[2] = assemble_gdt_entry(0x00000000, 0xFFFFFFFF, GDT_ENTRY_KDATA_FLAGS);
+
+    gdtr gdtr_instance;
+    gdtr_instance.limit = (sizeof(gdt) * GDT_ENTRY_COUNT ) - 1;
+    gdtr_instance.base = (uint32_t)&gdt;
+
+    _gdt_load(&gdtr_instance);
+}
 
 

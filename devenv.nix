@@ -29,8 +29,11 @@ in {
         rm -rf isodir build
         mkdir -p build
         i686-elf-as ./src/boot/boot.s -o ./build/boot.o
+        i686-elf-as ./src/kernel/gdt_load.s -o ./build/gdt_load.o
         i686-elf-gcc -c ./src/kernel/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o -lgcc
+        i686-elf-gcc -c ./src/kernel/gdt.c -o ./build/gdt.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o ./build/gdt.o ./build/gdt_load.o -lgcc
+        mkdir -p isodir/boot/grub
       '';
     };
     "mason:assemble_iso" = {
@@ -38,8 +41,10 @@ in {
         rm -rf isodir build
         mkdir -p build
         i686-elf-as ./src/boot/boot.s -o ./build/boot.o
+        i686-elf-as ./src/kernel/gdt_load.s -o ./build/gdt_load.o
         i686-elf-gcc -c ./src/kernel/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o -lgcc
+        i686-elf-gcc -c ./src/kernel/gdt.c -o ./build/gdt.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o ./build/gdt.o ./build/gdt_load.o -lgcc
         mkdir -p isodir/boot/grub
         cp ./build/mason isodir/boot/mason
         cp ./src/grub.cfg isodir/boot/grub/grub.cfg
@@ -51,8 +56,10 @@ in {
         rm -rf isodir build
         mkdir -p build
         i686-elf-as ./src/boot/boot.s -o ./build/boot.o
+        i686-elf-as ./src/kernel/gdt_load.s -o ./build/gdt_load.o
         i686-elf-gcc -c ./src/kernel/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o -lgcc
+        i686-elf-gcc -c ./src/kernel/gdt.c -o ./build/gdt.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o ./build/gdt.o ./build/gdt_load.o -lgcc
         mkdir -p isodir/boot/grub
         cp ./build/mason isodir/boot/mason
         cp ./src/grub.cfg isodir/boot/grub/grub.cfg
@@ -62,3 +69,5 @@ in {
     };
   };
 }
+#./build/gdt.o ./build/gdt_load.o
+

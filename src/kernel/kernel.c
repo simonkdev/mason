@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#import "gdt.c"
+#include "gdt.h"
 
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -111,7 +111,11 @@ void terminal_writestring(const char* data)
 
 void kernel_main(void)
 {
+    
+
     terminal_initialize();
     terminal_writestring("Hello, kernel World!\n");
     terminal_writestring("In a galaxy far, far away...\n");
+
+    gdt_init();
 }
