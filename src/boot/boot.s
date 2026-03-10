@@ -19,9 +19,9 @@ stack_top:
 .section .data
 .align 8
 gdt_start:
-    .long 0x0               
-    .long 0x00CF9A000000FFFF 
-    .long 0x00CF92000000FFFF  
+    .quad 0x0               
+    .quad 0x00CF9A000000FFFF 
+    .quad 0x00CF92000000FFFF  
 gdt_end:
 
 gdt_descriptor:
@@ -40,6 +40,8 @@ _start:
     call terminal_debugmsg_as
     lgdt gdt_descriptor
     call reloadSegments
+    call kernel_main
+
 
     cli
 1:  hlt

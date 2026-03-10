@@ -201,11 +201,9 @@ void terminal_debugmsg_as()
 
 void kernel_main(void)
 {
-    terminal_initialize();
+    terminal_writestring("GDT initialized\n");
     terminal_writestring("Hello, kernel World!\n");
     terminal_writestring("In a galaxy far, far away...\n");
-
-    terminal_writestring("GDT initialized\n");
 
     uint64_t dummy = 123; 
     terminal_write_u64(dummy, 10, false, false);
