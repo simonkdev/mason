@@ -182,20 +182,28 @@ void terminal_writeint(int value, char* result, int base)
     terminal_writestring("\n");
 }
 
+void terminal_debugmsg_as()
+{
+    terminal_writestring("Debug: This is a debug message.\n");
+}
 
-void kernel_gdt(void)
+
+// void kernel_gdt(void)
+// {
+//     terminal_initialize();
+//     terminal_writestring("Hello, kernel World!\n");
+//     terminal_writestring("In a galaxy far, far away...\n");
+
+//     gdt_init();
+
+//     kernel_main();
+// }
+
+void kernel_main(void)
 {
     terminal_initialize();
     terminal_writestring("Hello, kernel World!\n");
     terminal_writestring("In a galaxy far, far away...\n");
-
-    gdt_init();
-
-    kernel_main();
-}
-
-void kernel_main(void)
-{
 
     terminal_writestring("GDT initialized\n");
 

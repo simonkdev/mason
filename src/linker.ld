@@ -1,12 +1,13 @@
 ENTRY(_start)
+OUTPUT_FORMAT("elf32-i386")
 
 SECTIONS
 {
     . = 2M;
-    
-    .multiboot BLOCK(4K) : ALIGN(4K)
+
+    .text BLOCK(4K) : ALIGN(4K)
     {
-        *(.multiboot)
+        KEEP(*(.multiboot))
         *(.text)
     }
 
@@ -24,10 +25,5 @@ SECTIONS
     {
         *(COMMON)
         *(.bss)
-    }
-    
-    .asm BLOCK(4K) : ALIGN(4K)
-    {
-        *(.asm)
     }
 }
