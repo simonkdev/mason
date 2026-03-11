@@ -20,7 +20,7 @@ stack_top:
 .align 8
 gdt_start:
     .quad 0x0               
-    .quad 0x00CF9A000000FFFF 
+    .quad 0x00CF9A000000FFFF
     .quad 0x00CF92000000FFFF  
 gdt_end:
 

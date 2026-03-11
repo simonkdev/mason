@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include "../module-headers/terminal.h"
 
 char* convert_to_base(int value, char* result, int base) {
     if (base < 2 || base > 36) { *result = '\0'; return result; }
