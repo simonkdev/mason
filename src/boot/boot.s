@@ -37,7 +37,7 @@ _start:
     mov $stack_top, %esp
     cli
     call terminal_initialize
-    call terminal_debugmsg_as
+    call put_debug_msg
     lgdt gdt_descriptor
     call reloadSegments
     call kernel_main
@@ -48,7 +48,7 @@ _start:
     jmp 1b
 
 reloadSegments:
-   call terminal_debugmsg_as
+   call put_debug_msg
    ljmp $0x08, $.reload_CS
 .reload_CS:
    mov $0x10, %ax          
