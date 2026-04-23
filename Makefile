@@ -3,7 +3,6 @@
 
 CC = i686-elf-gcc
 AS = i686-elf-as
-LD = ld
 GRUB_MKRESCUE = grub-mkrescue
 QEMU = qemu-system-i386
 
@@ -16,7 +15,7 @@ ISO_FILE = mason.iso
 BOOT_S = $(SRC_DIR)/boot/boot.s
 GDT_LOAD_S = $(SRC_DIR)/kernel/gdt_load.s
 KERNEL_C = $(SRC_DIR)/kernel/kernel.c
-GDT_C = $(SRC_DIR)/kernel/gdt.c
+HELPERS_C = $(SRC_DIR)/kernel/helpers.c
 LINKER_LD = $(SRC_DIR)/linker.ld
 GRUB_CFG = $(SRC_DIR)/grub.cfg
 
@@ -24,7 +23,7 @@ GRUB_CFG = $(SRC_DIR)/grub.cfg
 BOOT_O = $(BUILD_DIR)/boot.o
 GDT_LOAD_O = $(BUILD_DIR)/gdt_load.o
 KERNEL_O = $(BUILD_DIR)/kernel.o
-GDT_O = $(BUILD_DIR)/gdt.o
+HELPERS_O = $(BUILD_DIR)/helpers.o
 MASON_BIN = $(BUILD_DIR)/mason
 
 .PHONY: all clean build assemble_iso test test-nobuild
@@ -40,10 +39,12 @@ build: $(BUILD_DIR)
 	$(AS) $(BOOT_S) -o $(BOOT_O)
 	$(AS) $(GDT_LOAD_S) -o $(GDT_LOAD_O)
 	$(CC) -c $(KERNEL_C) -o $(KERNEL_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-	$(CC) -c $(GDT_C) -o $(GDT_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(CC) -c $(HELPERS_C) -o $(HELPERS_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 	@echo "Linking kernel..."
-	$(CC) -T $(LINKER_LD) -o $(MASON_BIN) -ffreestanding -O2 -nostdlib $(BOOT_O) $(KERNEL_O) $(GDT_O) $(GDT_LOAD_O) -z max-page-size=0x1000 -lgcc
+	$(CC) -T $(LINKER_LD) -o $(MASON_BIN) -ffreestanding -O2 -nostdlib \
+		$(BOOT_O) $(KERNEL_O) $(HELPERS_O) $(GDT_LOAD_O) \
+		-z max-page-size=0x1000 -lgcc
 
 assemble_iso: build
 	@echo "Assembling ISO..."
