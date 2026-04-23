@@ -36,65 +36,65 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
 #define VGA_HEIGHT 25
 #define VGA_MEMORY 0xB8000
 
-size_t terminal_row;
-size_t terminal_column;
-uint8_t terminal_color;
-uint16_t* terminal_buffer = (uint16_t*) VGA_MEMORY;
+size_t vga_row;
+size_t vga_column;
+uint8_t vga_color;
+uint16_t* vga_buffer = (uint16_t*) VGA_MEMORY;
 
-void terminal_initialize(void)
+void vga_initialize(void)
 {
-    terminal_row = 0;
-    terminal_column = 0;
-    terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    vga_row = 0;
+    vga_column = 0;
+    vga_color = vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
 
     for (size_t y = 0; y<VGA_HEIGHT; y++) {
         for (size_t x = 0; x<VGA_WIDTH; x++) {
             const size_t index = y * VGA_WIDTH + x;
-            terminal_buffer[index] = vga_entry(' ', terminal_color);
+            vga_buffer[index] = vga_entry(' ', vga_color);
         }
     }
 }
 
-void terminal_setcolor(uint8_t color)
+void vga_setcolor(uint8_t color)
 {
-    terminal_color = color;
+    vga_color = color;
 }
 
-void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
+void vga_putentryat(char c, uint8_t color, size_t x, size_t y)
 {
     const size_t index = y * VGA_WIDTH + x;
-    terminal_buffer[index] = vga_entry(c, color);
+    vga_buffer[index] = vga_entry(c, color);
 }
 
-void terminal_putchar(char c)
+void vga_putchar(char c)
 {
     if (c == '\n') {
-        terminal_column = 0;
-        if (++terminal_row == VGA_HEIGHT)
-            terminal_row = 0;
+        vga_column = 0;
+        if (++vga_row == VGA_HEIGHT)
+            vga_row = 0;
     } else {
-        terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-        if (++terminal_column == VGA_WIDTH) {
-            terminal_column = 0;
-            if (++terminal_row == VGA_HEIGHT)
-                terminal_row = 0;
+        vga_putentryat(c, vga_color, vga_column, vga_row);
+        if (++vga_column == VGA_WIDTH) {
+            vga_column = 0;
+            if (++vga_row == VGA_HEIGHT)
+                vga_row = 0;
         }
     }
 }
 
-void terminal_write(const char* data, size_t size)
+void vga_write(const char* data, size_t size)
 {
     for (size_t i = 0; i < size; i++)
-        terminal_putchar(data[i]);
+        vga_putchar(data[i]);
 }
 
-void terminal_writestring(const char* data)
+void vga_writestring(const char* data)
 {
-    terminal_write(data, strlen(data));
+    vga_write(data, strlen(data));
 }
 
 
-void terminal_write_u64(uint64_t value, int base, bool add_prefix, bool uppercase)
+void vga_write_u64(uint64_t value, int base, bool add_prefix, bool uppercase)
 {
     static const char digits_low[]  = "0123456789abcdef";
     static const char digits_high[] = "0123456789ABCDEF";
@@ -114,8 +114,8 @@ void terminal_write_u64(uint64_t value, int base, bool add_prefix, bool uppercas
         }
         buf[pos++] = '0';
         buf[pos] = '\0';
-        terminal_writestring(buf);
-        terminal_writestring("\n");
+        vga_writestring(buf);
+        vga_writestring("\n");
         return;
     }
 
@@ -139,19 +139,19 @@ void terminal_write_u64(uint64_t value, int base, bool add_prefix, bool uppercas
         buf[pos++] = rev[i];
 
     buf[pos] = '\0';
-    terminal_writestring(buf);
-    terminal_writestring("\n");
+    vga_writestring(buf);
+    vga_writestring("\n");
 }
 
-void terminal_writeint(int value, char* result, int base)
+void vga_writeint(int value, char* result, int base)
 {
     convert_to_base(value, result, base);
-    terminal_writestring(result);
-    terminal_writestring("\n");
+    vga_writestring(result);
+    vga_writestring("\n");
 }
 
 void put_debug_msg()
 {
-    terminal_writestring("Debug: This is a debug message.\n");
+    vga_writestring("Debug: This is a debug message.\n");
 }
 
