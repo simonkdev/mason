@@ -15,65 +15,36 @@ in {
     pkgs.grub2
     pkgs.qemu
     pkgs.libisoburn
+    pkgs.cmake
+    pkgs.make
   ];
 
   # https://devenv.sh/tasks/
   tasks = {
     "mason:clean" = {
       exec = ''
-        rm -rf isodir build
+        make clean
       '';
     };
     "mason:build" = {
       exec = ''
-        rm -rf isodir build
-        mkdir -p build
-        i686-elf-as ./src/boot/boot.s -o ./build/boot.o
-        i686-elf-as ./src/kernel/gdt_load.s -o ./build/gdt_load.o
-        i686-elf-gcc -c ./src/kernel/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -c ./src/kernel/gdt.c -o ./build/gdt.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o ./build/gdt.o ./build/gdt_load.o -z max-page-size=0x1000 -lgcc
-        mkdir -p isodir/boot/grub
+        make build
       '';
     };
     "mason:assemble_iso" = {
       exec = ''
-        rm -rf isodir build
-        mkdir -p build
-        i686-elf-as ./src/boot/boot.s -o ./build/boot.o
-        i686-elf-as ./src/kernel/gdt_load.s -o ./build/gdt_load.o
-        i686-elf-gcc -c ./src/kernel/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -c ./src/kernel/gdt.c -o ./build/gdt.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o ./build/gdt.o ./build/gdt_load.o -lgcc
-        mkdir -p isodir/boot/grub
-        cp ./build/mason isodir/boot/mason
-        cp ./src/grub.cfg isodir/boot/grub/grub.cfg
-        grub-mkrescue -o mason.iso isodir
+        make assemble_iso
       '';
     };
     "mason:test" = {
       exec = ''
-        rm -rf isodir build
-        mkdir -p build
-        i686-elf-as ./src/boot/boot.s -o ./build/boot.o
-        i686-elf-gcc -c ./src/kernel/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -c ./src/kernel/modules/helpers.c -o ./build/helpers.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -c ./src/kernel/modules/terminal.c -o ./build/terminal.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-        i686-elf-gcc -T ./src/linker.ld -o ./build/mason -ffreestanding -O2 -nostdlib ./build/boot.o ./build/kernel.o ./build/helpers.o ./build/terminal.o -lgcc
-        mkdir -p isodir/boot/grub
-        cp ./build/mason isodir/boot/mason
-        cp ./src/grub.cfg isodir/boot/grub/grub.cfg
-        grub-mkrescue -o mason.iso isodir
-        qemu-system-i386 -cdrom mason.iso
+        make test
       '';
     };
     "mason:test-nobuild" = {
       exec = ''
-        qemu-system-i386 -kernel ./build/mason
+        make test-nobuild
       '';
     };
   };
 }
-#./build/gdt.o ./build/gdt_load.o
-#i686-elf-as ./src/kernel/gdt_load.s -o ./build/gdt_load.o
-
