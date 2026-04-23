@@ -16,7 +16,6 @@ in {
     pkgs.qemu
     pkgs.libisoburn
     pkgs.cmake
-    pkgs.make
   ];
 
   # https://devenv.sh/tasks/

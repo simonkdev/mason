@@ -16,6 +16,9 @@ BOOT_S = $(SRC_DIR)/boot/boot.s
 GDT_LOAD_S = $(SRC_DIR)/kernel/gdt_load.s
 KERNEL_C = $(SRC_DIR)/kernel/kernel.c
 HELPERS_C = $(SRC_DIR)/kernel/helpers.c
+IO_C = $(SRC_DIR)/kernel/drivers/io/io.c
+KEYBOARD_C = $(SRC_DIR)/kernel/drivers/io/keyboard.c
+VGA_C = $(SRC_DIR)/kernel/drivers/io/vga.c
 LINKER_LD = $(SRC_DIR)/linker.ld
 GRUB_CFG = $(SRC_DIR)/grub.cfg
 
@@ -24,6 +27,9 @@ BOOT_O = $(BUILD_DIR)/boot.o
 GDT_LOAD_O = $(BUILD_DIR)/gdt_load.o
 KERNEL_O = $(BUILD_DIR)/kernel.o
 HELPERS_O = $(BUILD_DIR)/helpers.o
+IO_O = $(BUILD_DIR)/io.o
+KEYBOARD_O = $(BUILD_DIR)/keyboard.o
+VGA_O = $(BUILD_DIR)/vga.o
 MASON_BIN = $(BUILD_DIR)/mason
 
 .PHONY: all clean build assemble_iso test test-nobuild
@@ -40,10 +46,13 @@ build: $(BUILD_DIR)
 	$(AS) $(GDT_LOAD_S) -o $(GDT_LOAD_O)
 	$(CC) -c $(KERNEL_C) -o $(KERNEL_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 	$(CC) -c $(HELPERS_C) -o $(HELPERS_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(CC) -c $(IO_C) -o $(IO_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(CC) -c $(KEYBOARD_C) -o $(KEYBOARD_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(CC) -c $(VGA_C) -o $(VGA_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 	@echo "Linking kernel..."
 	$(CC) -T $(LINKER_LD) -o $(MASON_BIN) -ffreestanding -O2 -nostdlib \
-		$(BOOT_O) $(KERNEL_O) $(HELPERS_O) $(GDT_LOAD_O) \
+		$(BOOT_O) $(KERNEL_O) $(HELPERS_O) $(IO_O) $(KEYBOARD_O) $(VGA_O) $(GDT_LOAD_O) \
 		-z max-page-size=0x1000 -lgcc
 
 assemble_iso: build
