@@ -55,6 +55,16 @@ void vga_initialize(void)
     }
 }
 
+void vga_clear()
+{
+    for (size_t y = 0; y<VGA_HEIGHT; y++) {
+        for (size_t x = 0; x<VGA_WIDTH; x++) {
+            const size_t index = y * VGA_WIDTH + x;
+            vga_buffer[index] = vga_entry(' ', vga_color);
+        }
+    }
+}
+
 void vga_setcolor(uint8_t color)
 {
     vga_color = color;
@@ -71,6 +81,7 @@ void vga_putchar(char c)
     if (c == '\n') {
         vga_column = 0;
         if (++vga_row == VGA_HEIGHT)
+            // vga_initialize(); // Clear screen if we reach the bottom
             vga_row = 0;
     } else {
         vga_putentryat(c, vga_color, vga_column, vga_row);
@@ -172,4 +183,10 @@ void vga_writehex_u16(uint16_t value) {
 void vga_writehex_u32(uint32_t value) {
     vga_writehex_u16((uint16_t)(value >> 16)); // High word
     vga_writehex_u16((uint16_t)(value & 0xFFFF)); // Low word
+}
+
+void vga_backspace()
+{
+    vga_putentryat(' ', vga_color, vga_column - 1, vga_row);
+    vga_column -= 1;
 }

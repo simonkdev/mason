@@ -131,36 +131,31 @@ int initialize_keyboard() {
 
 main_loop() {
     while(true) {
+        
         uint8_t last_key_code; 
         uint8_t code = read_signal_from_ps2();
+        
         if (code == last_key_code) {
             continue; // Skip processing if the same key code is received again
         }
+        
         if(code == 0xFA) {
             continue; // Ignore ACKs in the main loop
         }
-        vga_writehex(code);
-        vga_writestring("\n");
-
-        // vga_writestring("Key code: 0x");
-        // vga_writehex(code);
-        // vga_writestring("\n");
-
-        vga_writestring(get_key_val_from_code(code));
-        vga_writestring("\n");
-
-        // char key_val[5];
-        // strcpy(key_val , get_key_val_from_code(code));
         
-        // if (key_val != "null") {
-        //     vga_writestring(key_val);
-        //     vga_writestring("\n");
-        // } // else {
-            
-        // // vga_writestring("Key code: 0x");
-        // // vga_writehex(code);
-        // // vga_writestring("\n");
-        // }
+        char* ascii = get_key_val_from_code(code);
+
+        if (strcmp(ascii, "NUL") == 0)
+        {
+            do_nothing();
+        } else if (strcmp(ascii, "BS") == 0)
+        {
+            vga_backspace();
+        } else
+        {
+            vga_writestring(ascii);
+        }
+
         last_key_code = code;
     }
 }

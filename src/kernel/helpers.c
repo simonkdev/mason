@@ -42,3 +42,16 @@ void strcpy(char dest[], char src[]) {
     }
     dest[i] = '\0'; // Null-terminate the destination string
 }
+
+void do_nothing()
+{
+
+}
+
+int strcmp(const char* s1, const char* s2) {
+    while (*s1 != '\0' && *s2 != '\0' && *s1 == *s2) {
+        s1++;
+        s2++;
+    }
+    return *s1 - *s2;
+}
