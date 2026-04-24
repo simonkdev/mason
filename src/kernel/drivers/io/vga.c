@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include "../module-headers/helpers.h"
+#include "../../helpers.h"
 
 enum vga_color {
     VGA_COLOR_BLACK = 0,
@@ -155,3 +155,21 @@ void put_debug_msg()
     vga_writestring("Debug: This is a debug message.\n");
 }
 
+void vga_writehex(uint8_t value) {
+    char hex_digits[] = "0123456789abcdef";
+    char buffer[3]; // 2 hex digits + null terminator
+    buffer[0] = hex_digits[(value >> 4) & 0x0F]; // High nibble
+    buffer[1] = hex_digits[value & 0x0F];        // Low nibble
+    buffer[2] = '\0';
+    vga_writestring(buffer);
+}
+
+void vga_writehex_u16(uint16_t value) {
+    vga_writehex((uint8_t)(value >> 8));  // High byte
+    vga_writehex((uint8_t)(value & 0xFF)); // Low byte
+}
+
+void vga_writehex_u32(uint32_t value) {
+    vga_writehex_u16((uint16_t)(value >> 16)); // High word
+    vga_writehex_u16((uint16_t)(value & 0xFFFF)); // Low word
+}
