@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include "../module-headers/helpers.h"
+#include "../../helpers.h"
 
 
 #define VGA_WIDTH 80
@@ -21,3 +21,6 @@ void vga_write(const char* data, size_t size);
 void vga_writestring(const char* data);
 void vga_writeint(int value, char* result, int base);
 void vga_write_u64(uint64_t value, int base, bool add_prefix, bool uppercase);
+void vga_writehex(uint8_t value);
+void vga_writehex_u16(uint16_t value);
+
