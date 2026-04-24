@@ -2,7 +2,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-char* convert_to_base(int value, char* result, int base) {
+char* convert_to_base(int value, char* result, int base) 
+{
     if (base < 2 || base > 36) { *result = '\0'; return result; }
 
     char* ptr = result, *ptr1 = result, tmp_char;
@@ -33,3 +34,11 @@ size_t strlen(const char* str)
     return len;
 }
 
+void strcpy(char dest[], char src[]) {
+    int i = 0;
+    while (src[i] != '\0') {
+        dest[i] = src[i];
+        i++;
+    }
+    dest[i] = '\0'; // Null-terminate the destination string
+}
