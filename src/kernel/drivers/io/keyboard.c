@@ -136,13 +136,16 @@ void update_modifier_flags(code)
     switch (code) 
     {
         case 0x2A:
-            vga_writehex(code);
+            // vga_writehex(code);
             modifier_flags[0] = 1;
+            break;
         case 0xAA:
-            vga_writehex(code);
+            // vga_writehex(code);
             modifier_flags[0] = 0;
+            break;
         default:
             do_nothing();
+            break;
     }
 }
 
