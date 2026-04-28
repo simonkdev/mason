@@ -57,9 +57,18 @@ uint8_t key_vals[6][17] = {
     {0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 
+uint8_t key_vals_pressed[6][17] = {
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {176, 33, 147, 167, 36, 37, 38, 47, 40, 41, 61, 63, 96, 0},
+    {0, 81, 87, 69, 82, 84, 90, 85, 73, 79, 80, 220, 42, 0},
+    {0, 65, 83, 68, 70, 71, 72, 74, 75, 76, 214, 196, 39, 0},
+    {0, 62, 89, 88, 67, 86, 66, 78, 77, 59, 58, 95, 0},
+    {0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+};
 
 
-uint8_t get_key_code_ascii_pressed(uint8_t key_code)
+
+uint8_t get_key_code_ascii_pressed(uint8_t key_code, int modifier_flags[])
 {
     for (int i = 0; i < 6; i++) 
     {
@@ -67,16 +76,23 @@ uint8_t get_key_code_ascii_pressed(uint8_t key_code)
         {
             if (key_code_pressed[i][j] == key_code) 
             {
-                return key_vals[i][j]; // Return the ASCII code directly
+                switch (modifier_flags[0])
+                {
+                    case 0:
+                        return key_vals[i][j];
+                    case 1:
+                        return key_vals_pressed[i][j];
+                }
+                 // Return the ASCII code directly
             }
         }
     }
     return 0;
 }
 
-const char* get_key_val_from_code(uint8_t key_code)
+const char* get_key_val_from_code(uint8_t key_code, int modifier_flags[])
 {
-    uint8_t ascii_code = get_key_code_ascii_pressed(key_code);
+    uint8_t ascii_code = get_key_code_ascii_pressed(key_code, modifier_flags);
     //uint8_t buffer;
     // vga_writestring("HERE");
     // vga_writeint(index_r, (char*)&buffer, 10);

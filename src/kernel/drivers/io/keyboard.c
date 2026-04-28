@@ -7,6 +7,8 @@
 
 #define SIGNALS_TO_TERMINAL 0
 
+int modifier_flags[3] = {0, 0, 0}; //index 0 is shift, index 1 is shift lock, index 2 is alt gr
+
 void send_signal_to_ps2(uint8_t signal) 
 {
     outb(0x60, signal);
@@ -129,12 +131,31 @@ int initialize_keyboard() {
     return 1;
 }
 
+void update_modifier_flags(code)
+{
+    switch (code) 
+    {
+        case 0x2A:
+            vga_writehex(code);
+            modifier_flags[0] = 1;
+        case 0xAA:
+            vga_writehex(code);
+            modifier_flags[0] = 0;
+        default:
+            do_nothing();
+    }
+}
+
 main_loop() {
     while(true) {
         
         uint8_t last_key_code; 
         uint8_t code = read_signal_from_ps2();
-        
+
+        // vga_writehex(code);
+
+        update_modifier_flags(code);
+
         if (code == last_key_code) {
             continue; // Skip processing if the same key code is received again
         }
@@ -143,7 +164,7 @@ main_loop() {
             continue; // Ignore ACKs in the main loop
         }
         
-        char* ascii = get_key_val_from_code(code);
+        char* ascii = get_key_val_from_code(code, modifier_flags);
 
         if (strcmp(ascii, "NUL") == 0)
         {
@@ -155,6 +176,7 @@ main_loop() {
         {
             vga_writestring(ascii);
         }
+
 
         last_key_code = code;
     }
