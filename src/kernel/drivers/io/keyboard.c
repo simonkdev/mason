@@ -135,13 +135,30 @@ void update_modifier_flags(code)
 {
     switch (code) 
     {
-        case 0x2A:
-            // vga_writehex(code);
+        case 0x2A: // Shift press
             modifier_flags[0] = 1;
             break;
-        case 0xAA:
-            // vga_writehex(code);
+        case 0xAA: // Shift release
             modifier_flags[0] = 0;
+            break;
+        case 0x3A: // Shift lock press
+            if (modifier_flags[1] == 1)
+            {
+                modifier_flags[1] = 0;
+                // vga_writestring("Set shift lock pos to 0");
+                break;
+            } else if (modifier_flags[1] == 0)
+            {
+                modifier_flags[1] = 1;
+                // vga_writestring("Set shift lock pos to 1");
+                break;
+            }
+            break;
+        case 0x38:
+            modifier_flags[2] = 1;
+            break;
+        case 0xB8:
+            modifier_flags[2] = 0;
             break;
         default:
             do_nothing();
@@ -155,14 +172,15 @@ main_loop() {
         uint8_t last_key_code; 
         uint8_t code = read_signal_from_ps2();
 
-        // vga_writehex(code);
+        //vga_writehex(code);
 
-        update_modifier_flags(code);
-
+        
         if (code == last_key_code) {
             continue; // Skip processing if the same key code is received again
         }
         
+        update_modifier_flags(code);
+
         if(code == 0xFA) {
             continue; // Ignore ACKs in the main loop
         }
