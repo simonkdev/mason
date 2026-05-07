@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "../../helpers.h"
+#include "keyboard.h"
+#include "io.h"
 
 enum vga_color {
     VGA_COLOR_BLACK = 0,
@@ -21,6 +23,26 @@ enum vga_color {
     VGA_COLOR_LIGHT_BROWN = 14,
     VGA_COLOR_WHITE = 15
 };
+
+
+void enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
+{
+	outb(0x3D4, 0x0A);
+	outb(0x3D5, (inb(0x3D5) & 0xC0) | cursor_start);
+
+	outb(0x3D4, 0x0B);
+	outb(0x3D5, (inb(0x3D5) & 0xE0) | cursor_end);
+}
+
+void set_cursor_pos(int x, int y)
+{
+	uint16_t pos = y * VGA_WIDTH + x;
+
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, (uint8_t) (pos & 0xFF));
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
+}
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg)
 {
@@ -63,6 +85,8 @@ void vga_clear()
             vga_buffer[index] = vga_entry(' ', vga_color);
         }
     }
+    vga_column = 0;
+    vga_row = 0;
 }
 
 void vga_setcolor(uint8_t color)
@@ -102,6 +126,7 @@ void vga_write(const char* data, size_t size)
 void vga_writestring(const char* data)
 {
     vga_write(data, strlen(data));
+    set_cursor_pos(vga_column, vga_row);
 }
 
 
@@ -189,4 +214,87 @@ void vga_backspace()
 {
     vga_putentryat(' ', vga_color, vga_column - 1, vga_row);
     vga_column -= 1;
+}
+
+void vga_safe_backspace(size_t start_row, size_t start_col)
+{
+    if (vga_row < start_row) {
+        return;
+    }
+    if (vga_row == start_row && vga_column <= start_col) {
+        return;
+    }
+
+    if (vga_column > 0) {
+        vga_column -= 1;
+        vga_putentryat(' ', vga_color, vga_column, vga_row);
+        return;
+    }
+
+    if (vga_row == 0) {
+        return;
+    }
+
+    size_t new_row = vga_row - 1;
+    if (new_row < start_row) {
+        return;
+    }
+
+    vga_row = new_row;
+    vga_column = VGA_WIDTH - 1;
+    vga_putentryat(' ', vga_color, vga_column, vga_row);
+}
+
+char* vga_uinput()
+{
+    size_t inital_column = vga_column;
+    char input_buffer[128];
+    uint64_t index = 0;
+    uint8_t last_key_code; 
+    while (true) {
+        if (vga_column < inital_column) 
+        {
+            break;
+        }
+        uint8_t code = read_signal_from_ps2();
+        
+        if (code == last_key_code) {
+            continue; // Skip processing if the same key code is received again
+        }
+
+        if(code == 0xFA) {
+            continue; // Ignore ACKs in the main loop
+        }
+
+        update_modifier_flags(code);
+        
+
+        char* ascii = get_key_val_from_code(code, modifier_flags);
+        if (strcmp(ascii, "\n") == 0) {
+            input_buffer[index] = '\0'; // Null-terminate the string
+            break;
+        } else if (strcmp(ascii, "BS") == 0) {
+            if (index > 0) {
+                index--;
+                vga_backspace();
+            }
+        } else if (strcmp(ascii, "NUL") != 0) {
+            input_buffer[index] = "a";//ascii[0]; // Assuming ascii is a single character string
+            index++;
+            vga_putchar(ascii);
+        }
+        last_key_code = code;
+    }
+    return input_buffer; // Note: This returns a pointer to a local variable, which is unsafe. Consider using a static buffer or dynamic allocation.
+}
+
+char* vga_tty()
+{
+    vga_writestring("Welcome to the VGA Terminal!\n");
+    vga_writestring("Type something and press Enter:\n");
+    char* user_input = vga_uinput();
+    vga_writestring("You entered: ");
+    vga_writestring(user_input);
+    vga_writestring("\n");
+    return user_input;
 }
