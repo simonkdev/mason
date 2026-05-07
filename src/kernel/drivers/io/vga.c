@@ -67,7 +67,7 @@ void vga_initialize(void)
 {
     vga_row = 0;
     vga_column = 0;
-    vga_color = vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    vga_color = vga_entry_color(VGA_COLOR_MAGENTA, VGA_COLOR_BLACK);
 
     for (size_t y = 0; y<VGA_HEIGHT; y++) {
         for (size_t x = 0; x<VGA_WIDTH; x++) {
