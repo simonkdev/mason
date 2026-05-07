@@ -23,4 +23,4 @@ void vga_writeint(int value, char* result, int base);
 void vga_write_u64(uint64_t value, int base, bool add_prefix, bool uppercase);
 void vga_writehex(uint8_t value);
 void vga_writehex_u16(uint16_t value);
-
+void vga_safe_backspace(size_t start_row, size_t start_col);
