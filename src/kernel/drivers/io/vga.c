@@ -106,7 +106,7 @@ void vga_putchar(char c)
         vga_column = 0;
         if (++vga_row == VGA_HEIGHT)
             // vga_initialize(); // Clear screen if we reach the bottom
-            vga_row = 0;
+            vga_scroll_oneline();
     } else {
         vga_putentryat(c, vga_color, vga_column, vga_row);
         if (++vga_column == VGA_WIDTH) {
@@ -304,4 +304,24 @@ char* vga_tty()
     vga_writestring(user_input);
     vga_writestring("\n");
     return user_input;
+}
+
+void vga_scroll_oneline()
+{
+    for (size_t y = 1; y < VGA_HEIGHT; y++) {
+        for (size_t x = 0; x < VGA_WIDTH; x++) {
+            const size_t from_index = y * VGA_WIDTH + x;
+            const size_t to_index = (y - 1) * VGA_WIDTH + x;
+            vga_buffer[to_index] = vga_buffer[from_index];
+        }
+    }
+    // Clear the last line
+    for (size_t x = 0; x < VGA_WIDTH; x++) {
+        const size_t index = (VGA_HEIGHT - 1) * VGA_WIDTH + x;
+        vga_buffer[index] = vga_entry(' ', vga_color);
+    }
+    if (vga_row > 0) {
+        vga_row--;
+    }
+    set_cursor_pos(vga_column, vga_row);
 }

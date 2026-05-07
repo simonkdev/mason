@@ -2,6 +2,27 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+
+char *strslice(char *dest, const char *src, int start, int stop) 
+{
+    size_t src_len = 0;
+    while (src[src_len] != '\0') src_len++;
+
+    size_t actual_start = (start < 0) ? (src_len + start) : (size_t)start;
+    size_t actual_stop = (stop < 0) ? (src_len + stop) : (size_t)stop;
+
+    if (actual_start > src_len) actual_start = src_len;
+    if (actual_stop > src_len) actual_stop = src_len;
+    if (actual_start > actual_stop) actual_start = actual_stop;
+
+    size_t i;
+    for (i = 0; actual_start + i < actual_stop; i++) {
+        dest[i] = src[actual_start + i];
+    }
+    dest[i] = '\0';
+    return dest;
+}
+
 char* convert_to_base(int value, char* result, int base) 
 {
     if (base < 2 || base > 36) { *result = '\0'; return result; }

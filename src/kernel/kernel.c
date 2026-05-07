@@ -17,7 +17,7 @@ void kernel_main(void)
     initialize_keyboard();
 
     while(true) {
-        char* uinput = (char*)main_loop();
+        char* uinput = (char*)tty_input();
         uint8_t builtins_response = execute_builtins_from_cmd(uinput);
 
         // vga_writestring("\n");

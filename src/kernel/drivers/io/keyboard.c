@@ -166,7 +166,7 @@ void update_modifier_flags(code)
     }
 }
 
-char* main_loop(void) {
+char* tty_input(void) {
     uint8_t code = read_signal_from_ps2();
     uint8_t last_key_code = code;
 
@@ -213,6 +213,7 @@ char* main_loop(void) {
         } else if (strcmp(ascii, "\n") == 0)
         {
             input_buffer[index] = '\0';
+            vga_writestring("\n");
             return input_buffer; 
         }
         else
