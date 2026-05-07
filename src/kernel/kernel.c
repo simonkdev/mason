@@ -19,10 +19,6 @@ void kernel_main(void)
     while(true) {
         char* uinput = (char*)main_loop();
         uint8_t builtins_response = execute_builtins_from_cmd(uinput);
-        if (builtins_response != 0) {
-            vga_writestring("\n No command found. \n");
-            continue; // Builtin command executed, skip normal processing
-        }
 
         // vga_writestring("\n");
         // vga_writestring("You entered: ");

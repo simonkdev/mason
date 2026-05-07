@@ -214,35 +214,42 @@ void vga_backspace()
 {
     vga_putentryat(' ', vga_color, vga_column - 1, vga_row);
     vga_column -= 1;
+    set_cursor_pos(vga_column, vga_row);
 }
 
 void vga_safe_backspace(size_t start_row, size_t start_col)
 {
     if (vga_row < start_row) {
+        set_cursor_pos(vga_column, vga_row);
         return;
     }
     if (vga_row == start_row && vga_column <= start_col) {
+        set_cursor_pos(vga_column, vga_row);
         return;
     }
 
     if (vga_column > 0) {
         vga_column -= 1;
         vga_putentryat(' ', vga_color, vga_column, vga_row);
+        set_cursor_pos(vga_column, vga_row);
         return;
     }
 
     if (vga_row == 0) {
+        set_cursor_pos(vga_column, vga_row);
         return;
     }
 
     size_t new_row = vga_row - 1;
     if (new_row < start_row) {
+        set_cursor_pos(vga_column, vga_row);
         return;
     }
 
     vga_row = new_row;
     vga_column = VGA_WIDTH - 1;
     vga_putentryat(' ', vga_color, vga_column, vga_row);
+    set_cursor_pos(vga_column, vga_row);
 }
 
 char* vga_uinput()
