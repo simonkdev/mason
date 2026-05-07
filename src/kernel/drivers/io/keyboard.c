@@ -166,24 +166,38 @@ void update_modifier_flags(code)
     }
 }
 
-main_loop() {
+char* main_loop(void) {
+    uint8_t code = read_signal_from_ps2();
+    uint8_t last_key_code = code;
+
+    vga_writestring("\n");
+    vga_writestring("> ");
+    size_t inital_row = vga_row;
+
+    size_t inital_column = vga_column;
+    static char input_buffer[128];
+    uint64_t index = 0;
     while(true) {
+
+        if (vga_row < inital_row) 
+        {
+            continue;
+        }
         
-        uint8_t last_key_code; 
-        uint8_t code = read_signal_from_ps2();
+        code = read_signal_from_ps2();
 
         //vga_writehex(code);
 
         
         if (code == last_key_code) {
             continue; // Skip processing if the same key code is received again
+        } else if(code == 0xFA) {
+            continue; // Ignore ACKs in the main loop
         }
         
         update_modifier_flags(code);
 
-        if(code == 0xFA) {
-            continue; // Ignore ACKs in the main loop
-        }
+        
         
         char* ascii = get_key_val_from_code(code, modifier_flags);
 
@@ -192,12 +206,21 @@ main_loop() {
             do_nothing();
         } else if (strcmp(ascii, "BS") == 0)
         {
-            vga_backspace();
-        } else
+            if (index > 0) {
+                index--;
+            }
+            vga_safe_backspace(inital_row, inital_column);
+        } else if (strcmp(ascii, "\n") == 0)
         {
+            input_buffer[index] = '\0';
+            return input_buffer; 
+        }
+        else
+        {
+            input_buffer[index] = ascii[0];
+            index++;
             vga_writestring(ascii);
         }
-
 
         last_key_code = code;
     }
