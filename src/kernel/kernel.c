@@ -2,15 +2,15 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "helpers.h"
-#include "drivers/io/vga.h"
+#include "drivers/io/vgatxt.h"
 #include "drivers/io/keyboard.h"
 #include "builtins/builtins.h"
 
 void kernel_main(void)
 {
-    vga_writestring("GDT initialized\n");
-    vga_writestring("Hello, kernel World!\n");
-    vga_writestring("In a galaxy far, far away...\n");
+    vgatxt_writestring("GDT initialized\n");
+    vgatxt_writestring("Hello, kernel World!\n");
+    vgatxt_writestring("In a galaxy far, far away...\n");
 
     send_echo();
 
@@ -20,8 +20,8 @@ void kernel_main(void)
         char* uinput = (char*)tty_input();
         uint8_t builtins_response = execute_builtins_from_cmd(uinput);
 
-        // vga_writestring("\n");
-        // vga_writestring("You entered: ");
-        // vga_writestring(uinput);
+        // vgatxt_writestring("\n");
+        // vgatxt_writestring("You entered: ");
+        // vgatxt_writestring(uinput);
     }
 }

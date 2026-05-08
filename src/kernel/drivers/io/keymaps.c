@@ -1,6 +1,6 @@
 #include "keymaps.h"
 #include "../../helpers.h"
-#include "vga.h"
+#include "vgatxt.h"
 
 const char* ascii[256] = {
     [0] = "NUL", [1] = "SOH", [2] = "STX", [3] = "ETX", [4] = "EOT", [5] = "ENQ", [6] = "ACK", [7] = "BEL",
@@ -106,12 +106,12 @@ const char* get_key_val_from_code(uint8_t key_code, int modifier_flags[])
 {
     uint8_t ascii_code = get_key_code_ascii_pressed(key_code, modifier_flags);
     //uint8_t buffer;
-    // vga_writestring("HERE");
-    // vga_writeint(index_r, (char*)&buffer, 10);
-    // vga_writestring("\n");
-    // vga_writeint(index_c, (char*)&buffer, 10);
-    // vga_writestring("\n");
-    // vga_writestring("KEY CODE: 0x");
+    // vgatxt_writestring("HERE");
+    // vgatxt_writeint(index_r, (char*)&buffer, 10);
+    // vgatxt_writestring("\n");
+    // vgatxt_writeint(index_c, (char*)&buffer, 10);
+    // vgatxt_writestring("\n");
+    // vgatxt_writestring("KEY CODE: 0x");
     const char* ascii_char = ascii[ascii_code];
 
     return ascii_char;
@@ -119,14 +119,14 @@ const char* get_key_val_from_code(uint8_t key_code, int modifier_flags[])
 
 char magdump_keyvals()
 {
-//     vga_writestring(key_vals[0]);
+//     vgatxt_writestring(key_vals[0]);
     // for (int i = 0; i < sizeof(key_vals); i++)
     // {
     //     for (int j = 0; j < sizeof(key_vals[i]); j++)
     //     {
-    //         vga_writestring(key_vals[i][j]);
-    //         vga_writestring(" ");
+    //         vgatxt_writestring(key_vals[i][j]);
+    //         vgatxt_writestring(" ");
     //     }
-    //     vga_writestring("\n");
+    //     vgatxt_writestring("\n");
     // }
 }

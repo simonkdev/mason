@@ -18,7 +18,7 @@ KERNEL_C = $(SRC_DIR)/kernel/kernel.c
 HELPERS_C = $(SRC_DIR)/kernel/helpers.c
 IO_C = $(SRC_DIR)/kernel/drivers/io/io.c
 KEYBOARD_C = $(SRC_DIR)/kernel/drivers/io/keyboard.c
-VGA_C = $(SRC_DIR)/kernel/drivers/io/vga.c
+vgatxt_C = $(SRC_DIR)/kernel/drivers/io/vgatxt.c
 LINKER_LD = $(SRC_DIR)/linker.ld
 GRUB_CFG = $(SRC_DIR)/grub.cfg
 KEYMAPS_C = $(SRC_DIR)/kernel/drivers/io/keymaps.c
@@ -31,7 +31,7 @@ KERNEL_O = $(BUILD_DIR)/kernel.o
 HELPERS_O = $(BUILD_DIR)/helpers.o
 IO_O = $(BUILD_DIR)/io.o
 KEYBOARD_O = $(BUILD_DIR)/keyboard.o
-VGA_O = $(BUILD_DIR)/vga.o
+vgatxt_O = $(BUILD_DIR)/vgatxt.o
 MASON_BIN = $(BUILD_DIR)/mason
 KEYMAPS_O = $(BUILD_DIR)/keymaps.o
 BUILTINS_O = $(BUILD_DIR)/builtins.o
@@ -54,13 +54,13 @@ build-objects: $(BUILD_DIR)
 	$(CC) -c $(HELPERS_C) -o $(HELPERS_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 	$(CC) -c $(IO_C) -o $(IO_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 	$(CC) -c $(KEYBOARD_C) -o $(KEYBOARD_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-	$(CC) -c $(VGA_C) -o $(VGA_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(CC) -c $(vgatxt_C) -o $(vgatxt_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 	$(CC) -c $(KEYMAPS_C) -o $(KEYMAPS_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 	$(CC) -c $(BUILTINS_C) -o $(BUILTINS_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 	@echo "Linking kernel..."
 	$(CC) -T $(LINKER_LD) -o $(MASON_BIN) -ffreestanding -O2 -nostdlib \
-		$(BOOT_O) $(KERNEL_O) $(HELPERS_O) $(IO_O) $(KEYBOARD_O) $(VGA_O) $(GDT_LOAD_O) $(KEYMAPS_O) $(BUILTINS_O) \
+		$(BOOT_O) $(KERNEL_O) $(HELPERS_O) $(IO_O) $(KEYBOARD_O) $(vgatxt_O) $(GDT_LOAD_O) $(KEYMAPS_O) $(BUILTINS_O) \
 		-z max-page-size=0x1000 -lgcc
 
 assemble_iso: build-objects

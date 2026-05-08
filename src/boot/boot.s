@@ -36,7 +36,7 @@ gdt_descriptor:
 _start:
     mov $stack_top, %esp
     cli
-    call vga_initialize
+    call vgatxt_initialize
     call put_debug_msg
     lgdt gdt_descriptor
     call reloadSegments

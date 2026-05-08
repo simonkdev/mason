@@ -1,5 +1,5 @@
 #include "../../helpers.h"
-#include "vga.h"
+#include "vgatxt.h"
 #include "io.h"
 
 extern int modifier_flags[3];
