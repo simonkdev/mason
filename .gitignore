@@ -8,5 +8,6 @@ devenv.local.yaml
 
 # pre-commit
 .pre-commit-config.yaml
+.vscode
 
 commits.sh
