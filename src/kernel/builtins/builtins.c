@@ -24,13 +24,18 @@ uint8_t execute_builtins_from_cmd(char* cmd)
     }
     else if (strcmp(cmd, "loop") == 0)
     {
-        while(true) 
+        while(true)
         {
             vgatxt_writestring(" [ AS ] ");
         }
         return 0; // Indicate that a builtin command was executed
     }
-    else 
+    else if (strcmp(cmd, "interrupt") == 0)
+    {
+        asm volatile("int $0x30");
+        return 0; // Indicate that a builtin command was executed
+    }
+    else
     {
         vgatxt_writestring("Error: Command ");
         vgatxt_writestring(cmd);

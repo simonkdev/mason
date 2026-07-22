@@ -4,10 +4,12 @@
   config,
   inputs,
   ...
-}: let
-  i686-elf-gcc = pkgs.callPackage ./gcc-i686-elf.nix {};
-  i686-elf-binutils = pkgs.callPackage ./binutils-i686-elf.nix {};
-in {
+}:
+let
+  i686-elf-gcc = pkgs.callPackage ./gcc-i686-elf.nix { };
+  i686-elf-binutils = pkgs.callPackage ./binutils-i686-elf.nix { };
+in
+{
   packages = [
     pkgs.git
     i686-elf-gcc
@@ -16,6 +18,7 @@ in {
     pkgs.qemu
     pkgs.libisoburn
     pkgs.cmake
+    pkgs.gdb
   ];
 
   # https://devenv.sh/tasks/

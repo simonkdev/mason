@@ -14,11 +14,14 @@ ISO_FILE = mason.iso
 # Source files
 BOOT_S = $(SRC_DIR)/boot/boot.s
 GDT_LOAD_S = $(SRC_DIR)/kernel/gdt_load.s
+IDT_LOAD_S = $(SRC_DIR)/kernel/interrupts/idt_load.s
+ISR_S = $(SRC_DIR)/kernel/interrupts/isr.s
 KERNEL_C = $(SRC_DIR)/kernel/kernel.c
 HELPERS_C = $(SRC_DIR)/kernel/helpers.c
 IO_C = $(SRC_DIR)/kernel/drivers/io/io.c
 KEYBOARD_C = $(SRC_DIR)/kernel/drivers/io/keyboard.c
 vgatxt_C = $(SRC_DIR)/kernel/drivers/io/vgatxt.c
+IDT_C = $(SRC_DIR)/kernel/interrupts/idt.c
 LINKER_LD = $(SRC_DIR)/linker.ld
 GRUB_CFG = $(SRC_DIR)/grub.cfg
 KEYMAPS_C = $(SRC_DIR)/kernel/drivers/io/keymaps.c
@@ -27,11 +30,14 @@ BUILTINS_C = $(SRC_DIR)/kernel/builtins/builtins.c
 # Object files
 BOOT_O = $(BUILD_DIR)/boot.o
 GDT_LOAD_O = $(BUILD_DIR)/gdt_load.o
+IDT_LOAD_O = $(BUILD_DIR)/idt_load.o
+ISR_O = $(BUILD_DIR)/isr.o
 KERNEL_O = $(BUILD_DIR)/kernel.o
 HELPERS_O = $(BUILD_DIR)/helpers.o
 IO_O = $(BUILD_DIR)/io.o
 KEYBOARD_O = $(BUILD_DIR)/keyboard.o
 vgatxt_O = $(BUILD_DIR)/vgatxt.o
+IDT_O = $(BUILD_DIR)/idt.o
 MASON_BIN = $(BUILD_DIR)/mason
 KEYMAPS_O = $(BUILD_DIR)/keymaps.o
 BUILTINS_O = $(BUILD_DIR)/builtins.o
@@ -50,17 +56,20 @@ build-objects: $(BUILD_DIR)
 	@echo "Building boot and kernel objects..."
 	$(AS) $(BOOT_S) -o $(BOOT_O)
 	$(AS) $(GDT_LOAD_S) -o $(GDT_LOAD_O)
-	$(CC) -c $(KERNEL_C) -o $(KERNEL_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-	$(CC) -c $(HELPERS_C) -o $(HELPERS_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-	$(CC) -c $(IO_C) -o $(IO_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-	$(CC) -c $(KEYBOARD_C) -o $(KEYBOARD_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-	$(CC) -c $(vgatxt_C) -o $(vgatxt_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-	$(CC) -c $(KEYMAPS_C) -o $(KEYMAPS_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-	$(CC) -c $(BUILTINS_C) -o $(BUILTINS_O) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(AS) $(IDT_LOAD_S) -o $(IDT_LOAD_O)
+	$(AS) $(ISR_S) -o $(ISR_O)
+	$(CC) -c $(KERNEL_C) -o $(KERNEL_O) -std=gnu99 -ffreestanding  -Wall -Wextra -g
+	$(CC) -c $(HELPERS_C) -o $(HELPERS_O) -std=gnu99 -ffreestanding  -Wall -Wextra -g
+	$(CC) -c $(IO_C) -o $(IO_O) -std=gnu99 -ffreestanding  -Wall -Wextra -g
+	$(CC) -c $(KEYBOARD_C) -o $(KEYBOARD_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
+	$(CC) -c $(vgatxt_C) -o $(vgatxt_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
+	$(CC) -c $(IDT_C) -o $(IDT_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
+	$(CC) -c $(KEYMAPS_C) -o $(KEYMAPS_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
+	$(CC) -c $(BUILTINS_C) -o $(BUILTINS_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
 
 	@echo "Linking kernel..."
 	$(CC) -T $(LINKER_LD) -o $(MASON_BIN) -ffreestanding -O2 -nostdlib \
-		$(BOOT_O) $(KERNEL_O) $(HELPERS_O) $(IO_O) $(KEYBOARD_O) $(vgatxt_O) $(GDT_LOAD_O) $(KEYMAPS_O) $(BUILTINS_O) \
+		$(BOOT_O) $(KERNEL_O) $(HELPERS_O) $(IO_O) $(KEYBOARD_O) $(vgatxt_O) $(GDT_LOAD_O) $(IDT_LOAD_O) $(IDT_O) $(ISR_O) $(KEYMAPS_O) $(BUILTINS_O) \
 		-z max-page-size=0x1000 -lgcc
 
 assemble_iso: build-objects

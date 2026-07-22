@@ -13,20 +13,20 @@
 .section .bss
 .align 16
 stack_bottom:
-.skip 16382 #16 KiB
+.skip 16384 #16 KiB
 stack_top:
 
 .section .data
 .align 8
 gdt_start:
-    .quad 0x0               
+    .quad 0x0
     .quad 0x00CF9A000000FFFF
-    .quad 0x00CF92000000FFFF  
+    .quad 0x00CF92000000FFFF
 gdt_end:
 
 gdt_descriptor:
-    .word gdt_end - gdt_start - 1  
-    .long gdt_start               
+    .word gdt_end - gdt_start - 1
+    .long gdt_start
 
 .section .text
 
@@ -40,6 +40,7 @@ _start:
     call put_debug_msg
     lgdt gdt_descriptor
     call reloadSegments
+    call init_idt
     call kernel_main
 
 
@@ -51,7 +52,7 @@ reloadSegments:
    call put_debug_msg
    ljmp $0x08, $.reload_CS
 .reload_CS:
-   mov $0x10, %ax          
+   mov $0x10, %ax
    mov %ax, %ds
    mov %ax, %es
    mov %ax, %fs
@@ -60,4 +61,3 @@ reloadSegments:
    ret
 
 .size _start, . - _start#
-
