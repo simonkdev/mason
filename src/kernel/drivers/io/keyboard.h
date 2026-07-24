@@ -11,3 +11,5 @@ int send_echo(void);
 int initialize_keyboard(void);
 char* tty_input(void);
 // uint8_t convert_code_set_hex_to_int(uint8_t reply);
+void keyboard_interrupt_handler(void);
+char* tty_input_interrupts(void);
