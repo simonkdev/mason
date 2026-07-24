@@ -13,11 +13,18 @@ struct idt_pointer {
     uint32_t base;
 }__attribute__((packed));
 
+struct interrupt_frame {
+    uint32_t eip;
+    uint32_t cs;
+    uint32_t eflags;
+}__attribute__((packed));
+
+
 
 extern void load_idt(struct idt_pointer*);
 extern void interrupt_stub_30(void);
 
-
-void testHandler(void);
+void interrupt_dispatcher(uint32_t vector, struct interrupt_frame *frame);
+void testHandler(uint32_t vector);
 void init_idt(void);
 struct idt_entry generate_idt_entry(uint32_t handler_address, unsigned int dpl, unsigned int gate_type);

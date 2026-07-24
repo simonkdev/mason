@@ -6,7 +6,6 @@
 _Static_assert(sizeof(struct idt_entry) == 8, "IDT entry wrong size");
 _Static_assert(sizeof(struct idt_pointer) == 6, "IDT entry wrong size");
 
-
 struct idt_entry idt[256];
 
 struct idt_entry generate_idt_entry(uint32_t handler_address, unsigned int dpl, unsigned int gate_type)
@@ -26,11 +25,20 @@ struct idt_entry generate_idt_entry(uint32_t handler_address, unsigned int dpl, 
     return entry;
 }
 
-void testHandler()
+void testHandler(uint32_t vector)
 {
-    vgatxt_writestring("An interrupt was triggered!");
+    vgatxt_write_u64(vector, 16, true, false);
 }
 
+void interrupt_dispatcher(uint32_t vector, struct interrupt_frame *frame)
+{
+    switch(vector)
+    {
+        case 0x30:
+            testHandler(vector);
+            break;
+    }
+}
 
 void init_idt()
 {

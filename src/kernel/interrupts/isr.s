@@ -6,9 +6,27 @@
 
 
 interrupt_stub_30:
-    pusha
-    call testHandler
-    popa
-    iret
+    push $0x30
+    jmp interrupt_handler
 
+
+    # every push has its own negative equivalent: iret undoes the interrupt, pusha gets undone by popa, our add and push cancel each other out.
 .size interrupt_stub_30, . - interrupt_stub_30
+
+
+.global interrupt_handler
+.type interrupt_handler, @function
+.extern interrupt_dispatcher
+
+interrupt_handler:
+    pusha
+    lea 36(%esp), %eax      # interrupt frame pointer
+    push %eax               # push to stack
+    push 36(%esp)           # vector number
+    call interrupt_dispatcher
+    add $8, %esp            # undo the two pushes
+    popa
+    add $4, %esp            # undo the stub's push
+    iret                    # undo interrupts save
+
+.size interrupt_handler, . - interrupt_handler
