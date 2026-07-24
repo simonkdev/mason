@@ -1,16 +1,21 @@
 #include "io.h"
-#include <stdint.h>
+#include "../../builtins/stdint.h"
 #include <stddef.h>
 #include <stdbool.h>
 
-void outb(uint16_t port, uint8_t value) 
+void outb(uint16_t port, uint8_t value)
 {
     __asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
 }
 
-uint8_t inb(uint16_t port) 
+uint8_t inb(uint16_t port)
 {
     uint8_t ret;
     __asm__ volatile("inb %1, %0" : "=a"(ret) : "Nd"(port));
     return ret;
+}
+
+void io_wait()
+{
+    outb(0x80, 0);
 }
