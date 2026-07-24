@@ -22,6 +22,7 @@ IO_C = $(SRC_DIR)/kernel/drivers/io/io.c
 KEYBOARD_C = $(SRC_DIR)/kernel/drivers/io/keyboard.c
 vgatxt_C = $(SRC_DIR)/kernel/drivers/io/vgatxt.c
 IDT_C = $(SRC_DIR)/kernel/interrupts/idt.c
+PIC_C = $(SRC_DIR)/kernel/interrupts/pic.c
 LINKER_LD = $(SRC_DIR)/linker.ld
 GRUB_CFG = $(SRC_DIR)/grub.cfg
 KEYMAPS_C = $(SRC_DIR)/kernel/drivers/io/keymaps.c
@@ -38,6 +39,7 @@ IO_O = $(BUILD_DIR)/io.o
 KEYBOARD_O = $(BUILD_DIR)/keyboard.o
 vgatxt_O = $(BUILD_DIR)/vgatxt.o
 IDT_O = $(BUILD_DIR)/idt.o
+PIC_O = $(BUILD_DIR)/pic.o
 MASON_BIN = $(BUILD_DIR)/mason
 KEYMAPS_O = $(BUILD_DIR)/keymaps.o
 BUILTINS_O = $(BUILD_DIR)/builtins.o
@@ -64,12 +66,13 @@ build-objects: $(BUILD_DIR)
 	$(CC) -c $(KEYBOARD_C) -o $(KEYBOARD_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
 	$(CC) -c $(vgatxt_C) -o $(vgatxt_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
 	$(CC) -c $(IDT_C) -o $(IDT_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
+	$(CC) -c $(PIC_C) -o $(PIC_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
 	$(CC) -c $(KEYMAPS_C) -o $(KEYMAPS_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
 	$(CC) -c $(BUILTINS_C) -o $(BUILTINS_O) -std=gnu99 -ffreestanding -Wall -Wextra -g
 
 	@echo "Linking kernel..."
 	$(CC) -T $(LINKER_LD) -o $(MASON_BIN) -ffreestanding -O2 -nostdlib \
-		$(BOOT_O) $(KERNEL_O) $(HELPERS_O) $(IO_O) $(KEYBOARD_O) $(vgatxt_O) $(GDT_LOAD_O) $(IDT_LOAD_O) $(IDT_O) $(ISR_O) $(KEYMAPS_O) $(BUILTINS_O) \
+		$(BOOT_O) $(KERNEL_O) $(HELPERS_O) $(IO_O) $(KEYBOARD_O) $(vgatxt_O) $(GDT_LOAD_O) $(IDT_LOAD_O) $(IDT_O) $(ISR_O) $(PIC_O) $(KEYMAPS_O) $(BUILTINS_O) \
 		-z max-page-size=0x1000 -lgcc
 
 assemble_iso: build-objects
