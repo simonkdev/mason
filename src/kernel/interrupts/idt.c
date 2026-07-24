@@ -1,7 +1,9 @@
 
 #include "idt.h"
 #include "../drivers/io/vgatxt.h"
-#include <stdint.h>
+#include "../builtins/stdint.h"
+#include "pic.h"
+#include "../drivers/io/keyboard.h"
 
 _Static_assert(sizeof(struct idt_entry) == 8, "IDT entry wrong size");
 _Static_assert(sizeof(struct idt_pointer) == 6, "IDT entry wrong size");
@@ -37,11 +39,21 @@ void interrupt_dispatcher(uint32_t vector, struct interrupt_frame *frame)
         case 0x30:
             testHandler(vector);
             break;
+        case 0x21:
+            keyboard_interrupt_handler();
+            pic_send_eoi(1);
+            break;
+        case 0x20:
+            pic_send_eoi(0);
+            break;
     }
 }
 
 void init_idt()
 {
+    init_pic();
+    enable_irq(1);
+    enable_irq(0);
     for (int i = 0; i < 256; i++)
     {
         idt[i].offset_low = 0;
@@ -52,6 +64,10 @@ void init_idt()
     }
     struct idt_entry entry = generate_idt_entry((uint32_t)&interrupt_stub_30, 0x0, 0xE);
     idt[0x30] = entry;
+    struct idt_entry timer = generate_idt_entry((uint32_t)&interrupt_stub_20, 0x0, 0xE);
+    idt[0x20] = timer;
+    struct idt_entry keyboard = generate_idt_entry((uint32_t)&interrupt_stub_21, 0x0, 0xE);
+    idt[0x21] = keyboard;
     struct idt_pointer ptr;
     ptr.limit = sizeof(idt) - 1;
     ptr.base = (uint32_t)&idt[0];

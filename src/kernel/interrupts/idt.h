@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "../builtins/stdint.h"
 
 struct idt_entry {
     uint16_t offset_low;
@@ -23,6 +23,8 @@ struct interrupt_frame {
 
 extern void load_idt(struct idt_pointer*);
 extern void interrupt_stub_30(void);
+extern void interrupt_stub_21(void);
+extern void interrupt_stub_20(void);
 
 void interrupt_dispatcher(uint32_t vector, struct interrupt_frame *frame);
 void testHandler(uint32_t vector);
