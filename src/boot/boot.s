@@ -41,6 +41,7 @@ _start:
     lgdt gdt_descriptor
     call reloadSegments
     call init_idt
+    sti
     call kernel_main
 
 
