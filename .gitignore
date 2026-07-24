@@ -11,3 +11,4 @@ devenv.local.yaml
 .vscode
 
 commits.sh
+build
