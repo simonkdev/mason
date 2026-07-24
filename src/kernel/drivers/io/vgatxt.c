@@ -87,6 +87,7 @@ void vgatxt_clear()
     }
     vgatxt_column = 0;
     vgatxt_row = 0;
+    set_cursor_pos(vgatxt_column, vgatxt_row);
 }
 
 void vgatxt_setcolor(uint8_t color)
@@ -115,6 +116,7 @@ void vgatxt_putchar(char c)
                 vgatxt_row = 0;
         }
     }
+    set_cursor_pos(vgatxt_column, vgatxt_row);
 }
 
 void vgatxt_write(const char* data, size_t size)

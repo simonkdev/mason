@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "../helpers.h"
 #include "../drivers/io/vgatxt.h"
+#include "../drivers/io/keyboard.h"
 
 uint8_t execute_builtins_from_cmd(char* cmd)
 {
@@ -41,5 +42,46 @@ uint8_t execute_builtins_from_cmd(char* cmd)
         vgatxt_writestring(cmd);
         vgatxt_writestring(" not found. \n"); // Builtin command executed, skip normal processing
         return 1; // Indicate that no builtin command was executed
+    }
+}
+
+char line[128];
+size_t line_len = 0;
+
+void builtin_terminal(void)
+{
+    vgatxt_writestring(" > ");
+    while(1)
+    {
+        char *key = keyboard_getkey();
+
+        if(strcmp(key, "NUL") == 0)
+        {
+            continue;
+        }
+
+        if(strcmp(key, "BS") == 0)
+        {
+            if (line_len > 0)
+            {
+                line_len--;
+                line[line_len] = '\0';
+                vgatxt_backspace();
+            }
+            continue;
+        }
+
+        if (strcmp(key, "\n") == 0)
+        {
+            vgatxt_putchar('\n');
+            line[line_len] = '\0';
+            execute_builtins_from_cmd(line);
+            line_len = 0;
+            vgatxt_writestring(" > ");
+            continue;
+        }
+
+        line[line_len++] = key[0];
+        vgatxt_putchar(key[0]);
     }
 }

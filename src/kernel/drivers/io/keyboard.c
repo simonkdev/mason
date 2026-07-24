@@ -4,12 +4,14 @@
 #include <stdbool.h>
 #include "keymaps.h"
 #include <stddef.h>
+#include "keyboard.h"
 
 #define SIGNALS_TO_TERMINAL 0
-#define KEYBOARD_BUFFER_SIZE 128
 
-volatile char keyboard_buffer[KEYBOARD_BUFFER_SIZE];
-volatile uint64_t keyboard_buffer_index = 0;
+const char *keyboard_buffer[KEYBOARD_BUFFER_SIZE];
+
+size_t head = 0;
+size_t tail = 0;
 
 int modifier_flags[3] = {0, 0, 0}; //index 0 is shift, index 1 is shift lock, index 2 is alt gr
 
@@ -32,7 +34,6 @@ uint8_t read_signal_from_ps2()
         vgatxt_writestring("\n");
     }
     return received;
-
 }
 
 int get_current_code_set()
@@ -124,98 +125,6 @@ int initialize_keyboard() {
 
 void update_modifier_flags(code)
 {
-    switch (code)
-    {
-        case 0x2A: // Shift press
-            modifier_flags[0] = 1;
-            break;
-        case 0xAA: // Shift release
-            modifier_flags[0] = 0;
-            break;
-        case 0x3A: // Shift lock press
-            if (modifier_flags[1] == 1)
-            {
-                modifier_flags[1] = 0;
-                // vgatxt_writestring("Set shift lock pos to 0");
-                break;
-            } else if (modifier_flags[1] == 0)
-            {
-                modifier_flags[1] = 1;
-                // vgatxt_writestring("Set shift lock pos to 1");
-                break;
-            }
-            break;
-        case 0x38:
-            modifier_flags[2] = 1;
-            break;
-        case 0xB8:
-            modifier_flags[2] = 0;
-            break;
-        default:
-            do_nothing();
-            break;
-    }
-}
-
-char* tty_input(void) {
-    uint8_t code = read_signal_from_ps2();
-    uint8_t last_key_code = code;
-
-    vgatxt_writestring("\n");
-    vgatxt_writestring(" > ");
-    size_t inital_row = vgatxt_row;
-
-    size_t inital_column = vgatxt_column;
-    static char input_buffer[128];
-    uint64_t index = 0;
-    while(true) {
-
-        if (vgatxt_row < inital_row)
-        {
-            continue;
-        }
-
-        code = read_signal_from_ps2();
-
-        //vgatxt_writehex(code);
-
-
-        if (code == last_key_code) {
-            continue; // Skip processing if the same key code is received again
-        } else if(code == 0xFA) {
-            continue; // Ignore ACKs in the main loop
-        }
-
-        update_modifier_flags(code);
-
-
-
-        char* ascii = get_key_val_from_code(code, modifier_flags);
-
-        if (strcmp(ascii, "NUL") == 0)
-        {
-            do_nothing();
-        } else if (strcmp(ascii, "BS") == 0)
-        {
-            if (index > 0) {
-                index--;
-            }
-            vgatxt_safe_backspace(inital_row, inital_column);
-        } else if (strcmp(ascii, "\n") == 0)
-        {
-            input_buffer[index] = '\0';
-            vgatxt_writestring("\n");
-            return input_buffer;
-        }
-        else
-        {
-            input_buffer[index] = ascii[0];
-            index++;
-            vgatxt_writestring(ascii);
-        }
-
-        last_key_code = code;
-    }
 }
 
 void keyboard_interrupt_handler(void)
@@ -229,53 +138,21 @@ void keyboard_interrupt_handler(void)
 
     char* ascii = get_key_val_from_code(code, modifier_flags);
 
-    if (strcmp(ascii, "NUL") == 0)
-    {
-        return;
-    }
-    else if (strcmp(ascii, "BS") == 0)
-    {
-        if (keyboard_buffer_index > 0)
-            keyboard_buffer_index--;
-    }
-    else if (strcmp(ascii, "\n") == 0)
-    {
-        keyboard_buffer[keyboard_buffer_index] = '\0';
-    }
-    else
-    {
-        vgatxt_writestring(ascii);
-        if (keyboard_buffer_index < KEYBOARD_BUFFER_SIZE - 1)
-        {
-            keyboard_buffer[keyboard_buffer_index] = ascii[0];
-            keyboard_buffer_index++;
-        }
-    }
+    keyboard_buffer[head] = ascii;
+    head = (head + 1) % KEYBOARD_BUFFER_SIZE;
 }
 
-char* tty_input_interrupts(void)
+bool keyboard_available(void)
 {
-    static char input_buffer[KEYBOARD_BUFFER_SIZE];
+    return head != tail;
+}
 
-    vgatxt_writestring("\n > ");
+char *keyboard_getkey(void)
+{
+    if (head == tail)
+        return "NUL";
 
-    while (keyboard_buffer_index == 0)
-    {
-        // Wait for keyboard interrupt to fill buffer
-    }
-
-    uint64_t i = 0;
-
-    while (i < keyboard_buffer_index)
-    {
-        input_buffer[i] = keyboard_buffer[i];
-        vgatxt_writestring((char[]){keyboard_buffer[i], '\0'});
-        i++;
-    }
-
-    input_buffer[i] = '\0';
-
-    keyboard_buffer_index = 0;
-
-    return input_buffer;
+    char *ret = (char *)keyboard_buffer[tail];
+    tail = (tail + 1) % KEYBOARD_BUFFER_SIZE;
+    return ret;
 }

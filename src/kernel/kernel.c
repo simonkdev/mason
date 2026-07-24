@@ -15,13 +15,10 @@ void kernel_main(void)
     send_echo();
 
     initialize_keyboard();
+    builtin_terminal();
 
     while(true) {
         //char* uinput = (char*)tty_input_interrupts();
         //uint8_t builtins_response = execute_builtins_from_cmd(uinput);
-
-        // vgatxt_writestring("\n");
-        // vgatxt_writestring("You entered: ");
-        // vgatxt_writestring(uinput);
     }
 }
