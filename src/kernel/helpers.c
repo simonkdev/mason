@@ -1,9 +1,9 @@
-#include <stdint.h>
+#include "builtins/stdint.h"
 #include <stddef.h>
 #include <stdbool.h>
 
 
-char *strslice(char *dest, const char *src, int start, int stop) 
+char *strslice(char *dest, const char *src, int start, int stop)
 {
     size_t src_len = 0;
     while (src[src_len] != '\0') src_len++;
@@ -23,7 +23,7 @@ char *strslice(char *dest, const char *src, int start, int stop)
     return dest;
 }
 
-char* convert_to_base(int value, char* result, int base) 
+char* convert_to_base(int value, char* result, int base)
 {
     if (base < 2 || base > 36) { *result = '\0'; return result; }
 
@@ -38,7 +38,7 @@ char* convert_to_base(int value, char* result, int base)
 
     if (tmp_value < 0) *ptr++ = '-';
     *ptr-- = '\0';
-  
+
     while(ptr1 < ptr) {
         tmp_char = *ptr;
         *ptr--= *ptr1;
@@ -69,7 +69,7 @@ void do_nothing()
 
 }
 
-int strcmp(const char* s1, const char* s2) 
+int strcmp(const char* s1, const char* s2)
 {
     while (*s1 != '\0' && *s2 != '\0' && *s1 == *s2) {
         s1++;

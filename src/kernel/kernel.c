@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "builtins/stdint.h"
 #include <stddef.h>
 #include <stdbool.h>
 #include "helpers.h"
@@ -17,8 +17,8 @@ void kernel_main(void)
     initialize_keyboard();
 
     while(true) {
-        char* uinput = (char*)tty_input();
-        uint8_t builtins_response = execute_builtins_from_cmd(uinput);
+        //char* uinput = (char*)tty_input_interrupts();
+        //uint8_t builtins_response = execute_builtins_from_cmd(uinput);
 
         // vgatxt_writestring("\n");
         // vgatxt_writestring("You entered: ");

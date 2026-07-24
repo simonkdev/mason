@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "../../builtins/stdint.h"
 #include <stddef.h>
 #include <stdbool.h>
 #include "../../helpers.h"
@@ -257,14 +257,14 @@ char* vgatxt_uinput()
     size_t inital_column = vgatxt_column;
     char input_buffer[128];
     uint64_t index = 0;
-    uint8_t last_key_code; 
+    uint8_t last_key_code;
     while (true) {
-        if (vgatxt_column < inital_column) 
+        if (vgatxt_column < inital_column)
         {
             break;
         }
         uint8_t code = read_signal_from_ps2();
-        
+
         if (code == last_key_code) {
             continue; // Skip processing if the same key code is received again
         }
@@ -274,7 +274,7 @@ char* vgatxt_uinput()
         }
 
         update_modifier_flags(code);
-        
+
 
         char* ascii = get_key_val_from_code(code, modifier_flags);
         if (strcmp(ascii, "\n") == 0) {

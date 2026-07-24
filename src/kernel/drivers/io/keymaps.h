@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "../../builtins/stdint.h"
 #include <stddef.h>
 
 const char* get_key_val_from_code(uint8_t key_code, int modifier_flags[]);
