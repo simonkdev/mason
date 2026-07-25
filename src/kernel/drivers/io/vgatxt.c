@@ -4,25 +4,8 @@
 #include "../../helpers.h"
 #include "keyboard.h"
 #include "io.h"
+#include "vgatxt.h"
 
-enum vgatxt_color {
-    vgatxt_COLOR_BLACK = 0,
-    vgatxt_COLOR_BLUE = 1,
-    vgatxt_COLOR_GREEN = 2,
-    vgatxt_COLOR_CYAN = 3,
-    vgatxt_COLOR_RED = 4,
-    vgatxt_COLOR_MAGENTA = 5,
-    vgatxt_COLOR_BROWN = 6,
-    vgatxt_COLOR_LIGHT_GREY = 7,
-    vgatxt_COLOR_DARK_GREY = 8,
-    vgatxt_COLOR_LIGHT_BLUE = 9,
-    vgatxt_COLOR_LIGHT_GREEN = 10,
-    vgatxt_COLOR_LIGHT_CYAN = 11,
-    vgatxt_COLOR_LIGHT_RED = 12,
-    vgatxt_COLOR_LIGHT_MAGENTA = 13,
-    vgatxt_COLOR_LIGHT_BROWN = 14,
-    vgatxt_COLOR_WHITE = 15
-};
 
 
 void enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
@@ -32,6 +15,12 @@ void enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
 
 	outb(0x3D4, 0x0B);
 	outb(0x3D5, (inb(0x3D5) & 0xE0) | cursor_end);
+}
+
+void disable_cursor(void)
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, inb(0x3D5) | 0x20);
 }
 
 void set_cursor_pos(int x, int y)
@@ -63,11 +52,27 @@ size_t vgatxt_column;
 uint8_t vgatxt_color;
 uint16_t* vgatxt_buffer = (uint16_t*) vgatxt_MEMORY;
 
+enum vgatxt_color vgatxt_fg = vgatxt_COLOR_MAGENTA;
+enum vgatxt_color vgatxt_bg = vgatxt_COLOR_BLACK;
+
+void vgatxt_set_color(enum vgatxt_color fg, enum vgatxt_color bg)
+{
+    vgatxt_fg = fg;
+    vgatxt_bg = bg;
+}
+
+void vgatxt_set_entry(size_t row, size_t col)
+{
+    vgatxt_column = col;
+    vgatxt_row = row;
+    set_cursor_pos(vgatxt_column, vgatxt_row);
+}
+
 void vgatxt_initialize(void)
 {
     vgatxt_row = 0;
     vgatxt_column = 0;
-    vgatxt_color = vgatxt_entry_color(vgatxt_COLOR_MAGENTA, vgatxt_COLOR_BLACK);
+    vgatxt_color = vgatxt_entry_color(vgatxt_fg, vgatxt_bg);
 
     for (size_t y = 0; y<vgatxt_HEIGHT; y++) {
         for (size_t x = 0; x<vgatxt_WIDTH; x++) {
