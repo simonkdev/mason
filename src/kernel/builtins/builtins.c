@@ -33,7 +33,7 @@ uint8_t execute_builtins_from_cmd(char* cmd)
     }
     else if (strcmp(cmd, "interrupt") == 0)
     {
-        asm volatile("int $0x30");
+        asm volatile("int $0x08");
         return 0; // Indicate that a builtin command was executed
     }
     else

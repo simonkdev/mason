@@ -47,33 +47,33 @@ void interrupt_dispatcher(uint32_t vector, struct interrupt_frame *frame)
             pic_send_eoi(0);
             break;
         case 0x00:
-            kernel_panic(vector);
+            kernel_panic(vector, frame);
             break;
         case 0x01:
-            kernel_panic(vector);
+            kernel_panic(vector, frame);
             break;
         case 0x02:
-            kernel_panic(vector);
+            kernel_panic(vector, frame);
             break;
         case 0x04:
-            kernel_panic(vector);
+            kernel_panic(vector, frame);
             break;
         case 0x05:
-            kernel_panic(vector);
+            kernel_panic(vector, frame);
             break;
         case 0x06:
-            kernel_panic(vector);
+            kernel_panic(vector, frame);
             break;
         case 0x07:
-            kernel_panic(vector);
+            kernel_panic(vector, frame);
             break;
         case 0x08:
-            kernel_panic(vector);
+            kernel_panic(vector, frame);
             break;
     }
 }
 
-void kernel_panic(uint32_t vector)
+void kernel_panic(uint32_t vector, struct interrupt_frame *frame)
 {
     vgatxt_set_color(vgatxt_COLOR_WHITE, vgatxt_COLOR_BLUE);
     vgatxt_initialize();
@@ -85,27 +85,107 @@ void kernel_panic(uint32_t vector)
     {
         case 0x00:
             vgatxt_writestring("DIVIDE BY ZERO\n");
+            vgatxt_writestring("\n \n");
+            vgatxt_writestring("    EIP: 0x");
+            vgatxt_writehex(frame->eip);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    CS: 0x");
+            vgatxt_writehex(frame->cs);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    EFLAGS: 0x");
+            vgatxt_writehex(frame->eflags);
+            vgatxt_writestring("\n");
             break;
         case 0x01:
             vgatxt_writestring("DEBUG INTERRUPT\n");
+            vgatxt_writestring("\n \n");
+            vgatxt_writestring("    EIP: 0x");
+            vgatxt_writehex(frame->eip);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    CS: 0x");
+            vgatxt_writehex(frame->cs);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    EFLAGS: 0x");
+            vgatxt_writehex(frame->eflags);
+            vgatxt_writestring("\n");
             break;
         case 0x02:
             vgatxt_writestring("NONMASKABLE\n");
+            vgatxt_writestring("\n \n");
+            vgatxt_writestring("    EIP: 0x");
+            vgatxt_writehex(frame->eip);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    CS: 0x");
+            vgatxt_writehex(frame->cs);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    EFLAGS: 0x");
+            vgatxt_writehex(frame->eflags);
+            vgatxt_writestring("\n");
             break;
         case 0x04:
             vgatxt_writestring("OVERFLOW\n");
+            vgatxt_writestring("\n \n");
+            vgatxt_writestring("    EIP: 0x");
+            vgatxt_writehex(frame->eip);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    CS: 0x");
+            vgatxt_writehex(frame->cs);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    EFLAGS: 0x");
+            vgatxt_writehex(frame->eflags);
+            vgatxt_writestring("\n");
             break;
         case 0x05:
             vgatxt_writestring("BOUND RANGE EXCEEDED\n");
+            vgatxt_writestring("\n \n");
+            vgatxt_writestring("    EIP: 0x");
+            vgatxt_writehex(frame->eip);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    CS: 0x");
+            vgatxt_writehex(frame->cs);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    EFLAGS: 0x");
+            vgatxt_writehex(frame->eflags);
+            vgatxt_writestring("\n");
             break;
         case 0x06:
             vgatxt_writestring("INVALID OPCODE\n");
+            vgatxt_writestring("\n \n");
+            vgatxt_writestring("    EIP: 0x");
+            vgatxt_writehex(frame->eip);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    CS: 0x");
+            vgatxt_writehex(frame->cs);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    EFLAGS: 0x");
+            vgatxt_writehex(frame->eflags);
+            vgatxt_writestring("\n");
             break;
         case 0x07:
             vgatxt_writestring("DEVICE UNAVAILABLE\n");
+            vgatxt_writestring("\n \n");
+            vgatxt_writestring("    EIP: 0x");
+            vgatxt_writehex(frame->eip);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    CS: 0x");
+            vgatxt_writehex(frame->cs);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    EFLAGS: 0x");
+            vgatxt_writehex(frame->eflags);
+            vgatxt_writestring("\n");
             break;
         case 0x08:
             vgatxt_writestring("DOUBLE FAULT\n");
+            vgatxt_writestring("\n \n");
+            vgatxt_writestring("    EIP: 0x");
+            vgatxt_writehex(frame->eip);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    CS: 0x");
+            vgatxt_writehex(frame->cs);
+            vgatxt_writestring("\n");
+            vgatxt_writestring("    EFLAGS: 0x");
+            vgatxt_writehex(frame->eflags);
+            vgatxt_writestring("\n");
             break;
     }
     while (1)
