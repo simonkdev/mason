@@ -1,8 +1,8 @@
 #include "builtins/stdint.h"
 #include <stddef.h>
 #include <stdbool.h>
-#include "module-headers/helpers.h"
-#include "module-headers/vgatxt.h"
+#include "helpers.h"
+#include "drivers/io/vgatxt.h"
 
 
 void kernel_main(void);
